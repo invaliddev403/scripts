@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timestamp Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        input, select, button {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Timestamp Converter</h1>
+<p>Enter a timestamp and select the type:</p>
+
+<input type="text" id="timestamp" placeholder="Enter timestamp">
+<select id="timestampType">
+    <option value="chrome">Chrome Cookie Expiration Date</option>
+    <option value="unix">Unix Timestamp</option>
+    <option value="js">JavaScript Timestamp</option>
+    <option value="iso8601">ISO 8601 Format</option>
+</select>
+<button onclick="convertTimestamp()">Convert</button>
+
+<h2>Human Readable Dates:</h2>
+<p id="output24hrUTC"></p>
+<p id="output12hrUTC"></p>
+<p id="output12hrLocal"></p>
+
+<script>
+    function convertTimestamp() {
+        const timestamp = document.getElementById('timestamp').value;
+        const type = document.getElementById('timestampType').value;
+
+        try {
+            let unixTime;
+
+            if (type === 'chrome') {
+                unixTime = (parseInt(timestamp) - 11644473600000000) / 1e6;
+            } else if (type === 'unix') {
+                unixTime = parseInt(timestamp);
+            } else if (type === 'js') {
+                unixTime = parseInt(timestamp) / 1000;
+            } else if (type === 'iso8601') {
+                unixTime = new Date(timestamp).getTime() / 1000;
+            }
+
+            if (isNaN(unixTime)) {
+                throw new Error("Invalid timestamp");
+            }
+
+            const utcTime = new Date(unixTime * 1000).toUTCString();
+            const localTime = new Date(unixTime * 1000).toLocaleString();
+            const utcTime12hr = new Date(unixTime * 1000).toLocaleString('en-US', { timeZone: 'UTC', hour12: true });
+
+            document.getElementById('output24hrUTC').innerText = '24hr UTC: ' + utcTime;
+            document.getElementById('output12hrUTC').innerText = '12hr UTC: ' + utcTime12hr;
+            document.getElementById('output12hrLocal').innerText = '12hr Local: ' + localTime;
+
+        } catch (error) {
+            document.getElementById('output24hrUTC').innerText = 'Error: ' + error.message;
+            document.getElementById('output12hrUTC').innerText = '';
+            document.getElementById('output12hrLocal').innerText = '';
+        }
+    }
+</script>
+
+</body>
+</html>
